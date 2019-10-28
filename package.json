@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/cmastel/tinyapp/issues"
   },
-  "homepage": "https://github.com/cmastel/tinyapp#readme"
+  "homepage": "https://github.com/cmastel/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
