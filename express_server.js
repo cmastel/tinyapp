@@ -1,15 +1,18 @@
 // load required modules
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = 8080;
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}));
 
 // initialize starting  url "database"
 const urlDatabase = {
@@ -77,7 +80,8 @@ app.get("/urls", (req, res) => {
   // primary urls page, with summary of shortURL's and the
   // associated longURL's
   // each url pair can be Edited or Deleted from here
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
+
   let urlSummary = {};
   if (user) {
     urlSummary = urlsForUser(user.id);
@@ -92,8 +96,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   // /urls/new is a page where the user can specify and full URL,
   // so that the app can create a shortURL to associate with it
-  const user = req.cookies.user_id;
-  
+  const user = req.session.user_id;
   // if user is not logged in, redirect to the login page
   if (!user) {
     res.redirect('/urls/login');
@@ -105,19 +108,19 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/register", (req, res) => {
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
   let templateVars = {
     user: users[user],
-    user: req.cookies.user_id,
+    user: user,
   };
   res.render("urls_register", templateVars);
 });
 
 app.get("/urls/login", (req, res) => {
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
   let templateVars = {
     user: users[user],
-    user: req.cookies.user_id,
+    user: user,
   };
   res.render("urls_login", templateVars);
 });
@@ -125,7 +128,7 @@ app.get("/urls/login", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   // shows a page where a shortURL and longURL pair are summarized
   // a user can then edit the longURL associated with the shortURL
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
   const shortURL = req.params.shortURL;
   
   let templateVars = { 
@@ -157,7 +160,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
   const shortURL = req.params.shortURL;
   const hasURL = userHasURL(user.id, shortURL);
   if (!hasURL) {
@@ -172,7 +175,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
   const shortURL = req.params.shortURL;
   const hasURL = userHasURL(user.id, shortURL);
   console.log("hasURL", hasURL);
@@ -203,7 +206,7 @@ app.post("/login", (req, res) => {
   } else if (!bcrypt.compareSync(userPassword, hashedPassword)) {
     res.status(403).send('Incorrect password.');
   } else {
-    res.cookie('user_id', userID);
+    req.session.user_id = userID;
   };
 
   res.redirect("/urls");
@@ -212,7 +215,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   // when a user selects to logout, removes their user_id from 
   // the cookie
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -239,8 +242,7 @@ app.post("/register", (req, res) => {
     email: userEmail,
     password: hashedPassword
   };
-  console.log('users', users);
-  res.cookie('user_id', userID);
+  req.session.user_id = userID;
   res.redirect("/urls");
 })
 
