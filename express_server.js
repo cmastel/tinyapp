@@ -2,6 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = 8080;
@@ -77,9 +78,13 @@ app.get("/urls", (req, res) => {
   // associated longURL's
   // each url pair can be Edited or Deleted from here
   const user = req.cookies.user_id;
+  let urlSummary = {};
+  if (user) {
+    urlSummary = urlsForUser(user.id);
+  }
   let templateVars = { 
     user: users[user],
-    urls: urlsForUser(user.id) //urlDatabase 
+    urls: urlSummary //urlDatabase 
   };
   res.render("urls_index", templateVars);
 });
@@ -186,14 +191,16 @@ app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const userID = getUserID(userEmail); // returns false if userEmail in not in users
-
+  const hashedPassword = users[userID].password;
+  console.log('userPassword', userPassword);
+  console.log('hashedPassword', hashedPassword);
   // check for errors in login details
   if (userEmail === '' || userPassword === '') {
     res.status(400).send('Sorry, incomplete login informaiton.');
   }
   if (!userID) {
     res.status(403).send('That email address does not exist.');
-  } else if (users[userID].password !== userPassword) {
+  } else if (!bcrypt.compareSync(userPassword, hashedPassword)) {
     res.status(403).send('Incorrect password.');
   } else {
     res.cookie('user_id', userID);
@@ -216,6 +223,7 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const userEmail = req.body.email;
   const userPassword = req.body.password;
+  const hashedPassword = bcrypt.hashSync(userPassword, 10);
   
   // check for errors in register details
   if (userEmail === '' || userPassword === '') {
@@ -229,8 +237,9 @@ app.post("/register", (req, res) => {
   users[userID] = { 
     id: userID,
     email: userEmail,
-    password: userPassword
+    password: hashedPassword
   };
+  console.log('users', users);
   res.cookie('user_id', userID);
   res.redirect("/urls");
 })
