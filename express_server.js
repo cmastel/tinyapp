@@ -71,6 +71,12 @@ app.get("/urls/new", (req, res) => {
   // /urls/new is a page where the user can specify and full URL,
   // so that the app can create a shortURL to associate with it
   const user = req.cookies.user_id;
+  
+  // if user is not logged in, redirect to the login page
+  if (!user) {
+    res.redirect('/urls/login');
+  };
+  
   let templateVars = { 
     user: users[user],
   };
