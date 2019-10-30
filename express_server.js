@@ -62,6 +62,12 @@ function urlsForUser(id) {
   return urlsFiltered;
 };
 
+function userHasURL(userID, shortURL) {
+  const userURLs = urlsForUser(userID);
+  const userURLKeys = Object.keys(userURLs);
+  return userURLKeys.includes(shortURL);
+}
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -87,7 +93,6 @@ app.get("/urls/new", (req, res) => {
   if (!user) {
     res.redirect('/urls/login');
   };
-  
   let templateVars = { 
     user: users[user],
   };
@@ -117,13 +122,12 @@ app.get("/urls/:shortURL", (req, res) => {
   // a user can then edit the longURL associated with the shortURL
   const user = req.cookies.user_id;
   const shortURL = req.params.shortURL;
-  const userURLs = urlsForUser(user.id);
-  const userURLKeys = Object.keys(userURLs);
+  
   let templateVars = { 
     user: users[user],
     shortURL: shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    userHasURL: userURLKeys.includes(shortURL)
+    userHasURL: userHasURL(user.id, shortURL)
   };
   res.render("urls_show", templateVars);
 });
@@ -131,7 +135,8 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   // redirects the user to the website using the longURL associated
   // with a given shortURL
-  const longURL = urlDatabase[req.params.shortURL];
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 })
 
@@ -147,15 +152,33 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  // removes a shortURL and longURL pair from the "database"
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
+  const user = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+  const hasURL = userHasURL(user.id, shortURL);
+  if (!hasURL) {
+    console.log("You don't have permission to delete that!");
+    res.redirect("/urls");
+  } else {
+    delete urlDatabase[shortURL];
+    res.redirect("/urls");
+    // removes a shortURL and longURL pair from the "database"
+  };
+  
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
+  const user = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+  const hasURL = userHasURL(user.id, shortURL);
+  console.log("hasURL", hasURL);
+  if (!hasURL) {
+    console.log("You don't have permission to edit that!");
+    res.redirect("/urls");
+  } else {
   // allows the user to set a new longURL for a given shortURL
   urlDatabase[req.params.shortURL] = req.body.newLongURL;
   res.redirect("/urls");
+  };
 });
 
 app.post("/login", (req, res) => {
