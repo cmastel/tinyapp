@@ -15,12 +15,11 @@
 
     <!-- if there is no username, show the login form -->
     <% if(!user) { %>  
-    <form class="form-inline" action="/login" method="POST">
-      <div class="form-group mb-2">
-        <input class="form-control" type="text" name="username" placeholder="Username" style="width: 150px; margin: 1em">
-        <button type="login" class="btn btn-outline-dark">Login</button>
-      </div>
-    </form>
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/urls/login">Login</a>
+        <a class="nav-item nav-link" href="/urls/register">Register</a>
+    </div>
+    
     <!-- if there is a username, show the username and a logout button -->
     <% } else{ %>
       <a>Logged In As: <%= user.email %></a>
