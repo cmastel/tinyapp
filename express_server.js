@@ -12,8 +12,8 @@ app.set("view engine", "ejs");
 
 // initialize starting  url "database"
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "aJ48lW" },
+  "9sm5xK": { longURL: "http://google.com", userID: "aJ48lW" }
 };
 
 // initialize starting users "database"
@@ -121,10 +121,13 @@ app.get("/u/:shortURL", (req, res) => {
 })
 
 app.post("/urls", (req, res) => {
-  // creates a randome shortURL for a user inputed longURL
+  // creates a random shortURL for a user inputed longURL
   // adds the new shortURL and longURL pair to the "database"
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies.user_id.id,
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 

@@ -15,44 +15,57 @@
 
   <main style="margin: 1em;">
     <h3>My URLs</h3>
-    <!-- Set up a table that will list the shortURL and longURL pairs -->
-    <!-- The table will also contain buttons to Edit and Delete a pair -->
-    <table class="table">
-      <thead>
-        <tr>
-          <!-- Add titles to table -->
-          <th scope="col">Short URL</th> 
-          <th scope="col">Long URL</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Loop through each url pair in "database" -->
-        <% for(let url in urls) { %>
+    
+    <% if(!user) { %>  
+      <p>You are not logged in. Please <a href="/urls/login">Login</a> or <a href="/urls/register">Register</a> to view the URLs.</p>
+
+    <!-- if there is a user_id, show the email address and a logout button -->
+    <% } else{ %>
+      
+      <!-- Set up a table that will list the shortURL and longURL pairs -->
+      <!-- The table will also contain buttons to Edit and Delete a pair -->
+      <table class="table">
+        <thead>
           <tr>
-            <td><%= url %></td> <!-- add the shortURL -->
-            <td><%= urls[url] %></td> <!-- add the longURL -->
-            <td>
-                <!-- add the Edit button -->
-                <form method="GET" action="/urls/<%= url %>/">
-                  <div class="form-group mb-2">                     
-                      <button type="edit" class="btn btn-outline-primary">Edit</button>
-                  </div>
-                </form>
-            </td>
-            <td>
-                <!-- add the Delete button -->
-                <form method="POST" action="/urls/<%= url %>/delete">
-                  <div class="form-group mb-2">                     
-                      <button type="delete" class="btn btn-outline-danger">Delete</button>
-                  </div>
-                </form>
-            </td>
+            <!-- Add titles to table -->
+            <th scope="col">Short URL</th> 
+            <th scope="col">Long URL</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
           </tr>
-        <% } %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <!-- Loop through each url pair in "database" -->
+          <% for(let url in urls) { %>
+            <tr>
+              <td><%= url %></td> <!-- add the shortURL -->
+              <td><%= urls[url].longURL %></td> <!-- add the longURL -->
+              <td>
+                  <!-- add the Edit button -->
+                  <form method="GET" action="/urls/<%= url %>/">
+                    <div class="form-group mb-2">                     
+                        <button type="edit" class="btn btn-outline-primary">Edit</button>
+                    </div>
+                  </form>
+              </td>
+              <td>
+                  <!-- add the Delete button -->
+                  <form method="POST" action="/urls/<%= url %>/delete">
+                    <div class="form-group mb-2">                     
+                        <button type="delete" class="btn btn-outline-danger">Delete</button>
+                    </div>
+                  </form>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+
+    <% } %>
+    
+    
+    
+    
   </main>
 
   <!-- Bootstrap JS -->
