@@ -16,15 +16,38 @@ const urlDatabase = {
   "9sm5xK": "http://google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
 function generateRandomString() {
   // generates a random alpha-numeric string of 6 characters
   let randomString = '';
   const r = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   for (let i = 0; i < 6; i++) {
     randomString += r[Math.floor(Math.random() * r.length)];
-  }
+  };
   return randomString;
-}
+};
+
+function checkEmailAddress(newEmail) {
+  // checks if a provided email address is already in the users "database"
+  for (let user in users) {
+    if (users[user].email === newEmail) {
+      return false;
+    }; 
+  };
+  return true;
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -48,6 +71,13 @@ app.get("/urls/new", (req, res) => {
     username: req.cookies.username,
   };
   res.render("urls_new", templateVars);
+});
+
+app.get("/urls/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies.username,
+  };
+  res.render("urls_register", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -100,6 +130,28 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
 });
+
+app.post("/register", (req, res) => {
+  // when a new user registers, a random alpha-numeric ID is generated
+  // the users "database" is updated with the users ID, email, and address
+  // a cookie is created with their user ID
+  const userID = generateRandomString();
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  if (userEmail === '' || userPassword === '') {
+    res.status(400).send('Sorry, incomplete login informaiton.');
+  }
+  if (!checkEmailAddress(userEmail)) {
+    res.status(400).send('That email address already exists as a user.');
+  }
+  users[userID] = { 
+    id: userID,
+    email: userEmail,
+    password: userPassword
+  };
+  res.cookie('user_id', userID);
+  res.redirect("/urls");
+})
 
 // set up a server to listen on the specified port
 app.listen(PORT, () => {
