@@ -2,6 +2,8 @@
 
 A full stack web app built with Node and Express that allows users to shorten long URLs (i.e. bit.ly).
 
+![urls screenshot](/images/urls.jpeg)
+
 ## Purpose
 
 **_BEWARE:_ This project was published for learning purposes. It is _not_ intended for use in production-grade software.**
