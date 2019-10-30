@@ -10,12 +10,13 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
-// initialize starting "database"
+// initialize starting  url "database"
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://google.com"
 };
 
+// initialize starting users "database"
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -39,14 +40,15 @@ function generateRandomString() {
   return randomString;
 };
 
-function checkEmailAddress(newEmail) {
+function getUserID(newEmail) {
   // checks if a provided email address is already in the users "database"
+  let userID = false;
   for (let user in users) {
     if (users[user].email === newEmail) {
-      return false;
+      userID = user;
     }; 
   };
-  return true;
+  return userID;
 };
 
 app.get("/", (req, res) => {
@@ -57,8 +59,9 @@ app.get("/urls", (req, res) => {
   // primary urls page, with summary of shortURL's and the
   // associated longURL's
   // each url pair can be Edited or Deleted from here
+  const user = req.cookies.user_id;
   let templateVars = { 
-    username: req.cookies.username,
+    user: users[user],
     urls: urlDatabase 
   };
   res.render("urls_index", templateVars);
@@ -67,28 +70,41 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   // /urls/new is a page where the user can specify and full URL,
   // so that the app can create a shortURL to associate with it
+  const user = req.cookies.user_id;
   let templateVars = { 
-    username: req.cookies.username,
+    user: users[user],
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/register", (req, res) => {
+  const user = req.cookies.user_id;
   let templateVars = {
-    username: req.cookies.username,
+    user: users[user],
+    user: req.cookies.user_id,
   };
   res.render("urls_register", templateVars);
+});
+
+app.get("/urls/login", (req, res) => {
+  const user = req.cookies.user_id;
+  let templateVars = {
+    user: users[user],
+    user: req.cookies.user_id,
+  };
+  res.render("urls_login", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   // shows a page where a shortURL and longURL pair are summarized
   // a user can then edit the longURL associated with the shortURL
+  const user = req.cookies.user_id;
   let templateVars = { 
-    username: req.cookies.username,
+    user: users[user],
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL] 
   };
-  res.render("/urls_show", templateVars);
+  res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -119,15 +135,30 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  // when a user logs in, sets a cookie to store their username
-  res.cookie('username', req.body.username);
+  // when a user logs in, sets a cookie to store their user_id
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  const userID = getUserID(userEmail); // returns false if userEmail in not in users
+
+  // check for errors in login details
+  if (userEmail === '' || userPassword === '') {
+    res.status(400).send('Sorry, incomplete login informaiton.');
+  }
+  if (!userID) {
+    res.status(403).send('That email address does not exist.');
+  } else if (users[userID].password !== userPassword) {
+    res.status(403).send('Incorrect password.');
+  } else {
+    res.cookie('user_id', userID);
+  };
+
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  // when a user selects to logout, removes their username from 
+  // when a user selects to logout, removes their user_id from 
   // the cookie
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
@@ -138,12 +169,16 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const userEmail = req.body.email;
   const userPassword = req.body.password;
+  
+  // check for errors in register details
   if (userEmail === '' || userPassword === '') {
     res.status(400).send('Sorry, incomplete login informaiton.');
   }
-  if (!checkEmailAddress(userEmail)) {
+  if (getUserID(userEmail)) {
     res.status(400).send('That email address already exists as a user.');
   }
+
+  // add new user details to users "database"
   users[userID] = { 
     id: userID,
     email: userEmail,
