@@ -13,14 +13,14 @@
       </div>
     </div>
 
-    <!-- if there is no username, show the login form -->
+    <!-- if there is no user_id, show the login form -->
     <% if(!user) { %>  
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls/login">Login</a>
         <a class="nav-item nav-link" href="/urls/register">Register</a>
     </div>
-    
-    <!-- if there is a username, show the username and a logout button -->
+
+    <!-- if there is a user_id, show the email address and a logout button -->
     <% } else{ %>
       <a>Logged In As: <%= user.email %></a>
       <form class="form-inline" action="/logout" method="POST">
