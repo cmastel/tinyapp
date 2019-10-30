@@ -51,6 +51,17 @@ function getUserID(newEmail) {
   return userID;
 };
 
+function urlsForUser(id) {
+  // iterates through the urlDatase object
+  let urlsFiltered = {};
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      urlsFiltered[shortURL] = urlDatabase[shortURL].longURL;
+    };
+  };
+  return urlsFiltered;
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -62,7 +73,7 @@ app.get("/urls", (req, res) => {
   const user = req.cookies.user_id;
   let templateVars = { 
     user: users[user],
-    urls: urlDatabase 
+    urls: urlsForUser(user.id) //urlDatabase 
   };
   res.render("urls_index", templateVars);
 });
@@ -105,10 +116,14 @@ app.get("/urls/:shortURL", (req, res) => {
   // shows a page where a shortURL and longURL pair are summarized
   // a user can then edit the longURL associated with the shortURL
   const user = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+  const userURLs = urlsForUser(user.id);
+  const userURLKeys = Object.keys(userURLs);
   let templateVars = { 
     user: users[user],
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL] 
+    shortURL: shortURL, 
+    longURL: urlDatabase[req.params.shortURL],
+    userHasURL: userURLKeys.includes(shortURL)
   };
   res.render("urls_show", templateVars);
 });
