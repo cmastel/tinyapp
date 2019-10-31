@@ -79,6 +79,7 @@ app.get("/urls/new", (req, res) => {
   const user = req.session.user_id;
   if (!user) {
     res.redirect('/urls/login');
+    return;
   };
   let templateVars = { 
     user: user,
@@ -90,6 +91,7 @@ app.get("/urls/register", (req, res) => {
   const user = req.session.user_id;
   if (user) {
     res.redirect("/urls");
+    return;
   }
   let templateVars = {
     user: user,
@@ -101,6 +103,7 @@ app.get("/urls/login", (req, res) => {
   const user = req.session.user_id;
   if (user) {
     res.redirect("/urls");
+    return;
   }
   let templateVars = {
     user: user,
