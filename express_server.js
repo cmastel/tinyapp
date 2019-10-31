@@ -44,11 +44,11 @@ function generateRandomString() {
   return randomString;
 };
 
-function getUserID(newEmail) {
+function getUserID(newEmail, database) {
   // checks if a provided email address is already in the users "database"
   let userID = false;
-  for (let user in users) {
-    if (users[user].email === newEmail) {
+  for (let user in database) {
+    if (database[user].email === newEmail) {
       userID = user;
     }; 
   };
@@ -193,7 +193,7 @@ app.post("/login", (req, res) => {
   // when a user logs in, sets a cookie to store their user_id
   const userEmail = req.body.email;
   const userPassword = req.body.password;
-  const userID = getUserID(userEmail); // returns false if userEmail in not in users
+  const userID = getUserID(userEmail, users); // returns false if userEmail in not in users
   const hashedPassword = users[userID].password;
   console.log('userPassword', userPassword);
   console.log('hashedPassword', hashedPassword);
@@ -232,7 +232,7 @@ app.post("/register", (req, res) => {
   if (userEmail === '' || userPassword === '') {
     res.status(400).send('Sorry, incomplete login informaiton.');
   }
-  if (getUserID(userEmail)) {
+  if (getUserID(userEmail, database)) {
     res.status(400).send('That email address already exists as a user.');
   }
 
