@@ -124,7 +124,6 @@ app.get("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID];
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL].showPageCount += 1;
   
   let templateVars = {
     user: user,
@@ -143,6 +142,7 @@ app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[shortURL] === undefined) {
     res.status(403).send('That shortURL does not exist.');
   }
+  urlDatabase[shortURL].showPageCount += 1; // update count on number of times the shortURL is visited
   const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
