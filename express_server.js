@@ -3,8 +3,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcrypt');
-const { 
-  generateRandomString, 
+const {
+  generateRandomString,
   getUserID,
   urlsForUser,
   userHasURL } = require('./helpers');
@@ -50,7 +50,7 @@ app.get("/", (req, res) => {
     res.redirect("/urls");
   } else {
     res.redirect("/urls/login");
-  };
+  }
   
 });
 
@@ -60,13 +60,13 @@ app.get("/urls", (req, res) => {
   // each url pair can be Edited or Deleted from here
   const userID = req.session.user_id;
   const user = users[userID];
-  // so that the user only sees "their" urls, an empty string 
+  // so that the user only sees "their" urls, an empty string
   // is initialized and "their" urls will be added to it
   let urlSummary = {};
   if (user) {
     urlSummary = urlsForUser(user.id, urlDatabase);
   }
-  let templateVars = { 
+  let templateVars = {
     user: user,
     urls: urlSummary // sending only the urls associated with the user
   };
@@ -80,8 +80,8 @@ app.get("/urls/new", (req, res) => {
   if (!user) {
     res.redirect('/urls/login');
     return;
-  };
-  let templateVars = { 
+  }
+  let templateVars = {
     user: user,
   };
   res.render("urls_new", templateVars);
@@ -118,9 +118,9 @@ app.get("/urls/:shortURL", (req, res) => {
   const user = users[userID];
   const shortURL = req.params.shortURL;
   
-  let templateVars = { 
+  let templateVars = {
     user: user,
-    shortURL: shortURL, 
+    shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
     userHasURL: userHasURL(user.id, shortURL, urlDatabase) // checks if user has permission for shortURL
   };
@@ -136,7 +136,7 @@ app.get("/u/:shortURL", (req, res) => {
   }
   const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
-})
+});
 
 //---------------------- POST -------------------------------//
 
@@ -164,14 +164,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
     // removes a shortURL and longURL pair from the "database"
-  };
+  }
   
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    res.redirect("/login")
+    res.redirect("/login");
   }
   const shortURL = req.params.shortURL;
   const hasURL = userHasURL(userID, shortURL, urlDatabase);
@@ -180,9 +180,9 @@ app.post("/urls/:shortURL/edit", (req, res) => {
     res.status(403).send("You don't have permission to edit that!");
   } else {
   // allows the user to set a new longURL for a given shortURL
-  urlDatabase[req.params.shortURL].longURL = req.body.newLongURL;
-  res.redirect("/urls");
-  };
+    urlDatabase[req.params.shortURL].longURL = req.body.newLongURL;
+    res.redirect("/urls");
+  }
 });
 
 app.post("/login", (req, res) => {
@@ -201,13 +201,13 @@ app.post("/login", (req, res) => {
     res.status(403).send('Incorrect password.');
   } else {
     req.session.user_id = userID;
-  };
+  }
 
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  // when a user selects to logout, removes their user_id from 
+  // when a user selects to logout, removes their user_id from
   // the cookie
   req.session = null;
   res.redirect("/urls");
@@ -231,14 +231,14 @@ app.post("/register", (req, res) => {
   }
 
   // add new user details to users "database"
-  users[userID] = { 
+  users[userID] = {
     id: userID,
     email: userEmail,
     password: hashedPassword
   };
   req.session.user_id = userID;
   res.redirect("/urls");
-})
+});
 
 //---------------------- SERVER -------------------------------//
 

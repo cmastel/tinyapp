@@ -1,19 +1,19 @@
 const { assert } = require('chai');
-const { 
-  generateRandomString, 
+const {
+  generateRandomString,
   getUserID,
   urlsForUser,
   userHasURL } = require('../helpers');
 
 const testUsers = {
-"userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
   "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
 };
@@ -32,18 +32,18 @@ describe('#generateRandomString', function() {
 
 describe('#getUserID', function() {
   it('should the user ID of a valid email', function() {
-    const user = getUserID('user@example.com', testUsers)
+    const user = getUserID('user@example.com', testUsers);
     const expectedOutput = 'userRandomID';
     assert.strictEqual(expectedOutput, user);
   });
   it('should return false if there is no valid email', function() {
-    const user = getUserID('a@example.com', testUsers)
+    const user = getUserID('a@example.com', testUsers);
     assert.isFalse(user);
   });
 });
 
 describe('#urlsForUser', function() {
-  it('should return { "9sm5xK": "http://google.com" } for userID: "user2RandomID', function () {
+  it('should return { "9sm5xK": "http://google.com" } for userID: "user2RandomID', function() {
     const filteredUrls = urlsForUser("user2RandomID", urlDatabase);
     const expectedOutput = { "9sm5xK": "http://google.com" };
     assert.deepEqual(expectedOutput, filteredUrls);
@@ -62,6 +62,6 @@ describe('#userHasURL', function() {
   it('should return false that userRandomeID has 9sm5xK', function() {
     const hasURL = userHasURL('userRandomID', '9sm5xK', urlDatabase);
     assert.isFalse(hasURL);
-  })
+  });
 });
 
