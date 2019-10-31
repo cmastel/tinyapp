@@ -232,7 +232,7 @@ app.post("/register", (req, res) => {
   if (userEmail === '' || userPassword === '') {
     res.status(400).send('Sorry, incomplete login informaiton.');
   }
-  if (getUserID(userEmail, database)) {
+  if (getUserID(userEmail, users)) {
     res.status(400).send('That email address already exists as a user.');
   }
 
