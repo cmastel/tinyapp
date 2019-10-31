@@ -25,8 +25,14 @@ app.use(cookieSession({
 
 // initialize starting  url "database"
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "aJ48lW" },
-  "9sm5xK": { longURL: "http://google.com", userID: "aJ48lW" }
+  "b2xVn2": { 
+    longURL: "http://www.lighthouselabs.ca", 
+    userID: "aJ48lW",
+    showPageCount: 0 },
+  "9sm5xK": { 
+    longURL: "http://google.com", 
+    userID: "aJ48lW",
+    showPageCount: 0 }
 };
 
 // initialize starting users "database"
@@ -42,7 +48,6 @@ const users = {
     password: "dishwasher-funk"
   }
 };
-
 
 //---------------------- GET -------------------------------//
 
@@ -119,12 +124,14 @@ app.get("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID];
   const shortURL = req.params.shortURL;
+  urlDatabase[shortURL].showPageCount += 1;
   
   let templateVars = {
     user: user,
     shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
-    userHasURL: userHasURL(user.id, shortURL, urlDatabase) // checks if user has permission for shortURL
+    userHasURL: userHasURL(user.id, shortURL, urlDatabase), // checks if user has permission for shortURL,
+    showPageCount: urlDatabase[shortURL].showPageCount
   };
   res.render("urls_show", templateVars);
 });
@@ -151,6 +158,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
+    showPageCount: 0,
   };
   res.redirect(`/urls/${shortURL}`);
 });
