@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcrypt');
+const methodOverride = require('method-override');
 const {
   generateRandomString,
   getUserID,
@@ -14,6 +15,7 @@ const PORT = 8080;
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
@@ -153,7 +155,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   const shortURL = req.params.shortURL;
   const hasURL = userHasURL(userID, shortURL, urlDatabase);
@@ -168,7 +170,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   
 });
 
-app.post("/urls/:shortURL/edit", (req, res) => {
+app.put("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
     res.redirect("/login");
