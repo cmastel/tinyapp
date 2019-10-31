@@ -40,28 +40,38 @@ const users = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const user = req.session.user_id;
+  if (user) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/urls/login");
+  };
+  
 });
 
 app.get("/urls", (req, res) => {
   // primary urls page, with summary of shortURL's and the
   // associated longURL's
   // each url pair can be Edited or Deleted from here
-  const user = req.session.user_id;
-
+  const userID = req.session.user_id;
+  const user = users[userID];
+  // so that the user only sees "their" urls, an empty string 
+  // is initialized and "their" urls will be added to it
   let urlSummary = {};
   if (user) {
+    console.log('If is running for ', user.id);
     urlSummary = urlsForUser(user.id, urlDatabase);
   }
   let templateVars = { 
-    user: users[user],
-    urls: urlSummary //urlDatabase 
+    user: user,
+    urls: urlSummary // sending only the urls associated with the user
   };
+  console.log('urlDatabase', urlDatabase);
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  // /urls/new is a page where the user can specify and full URL,
+  // /urls/new is a page where the user can specify a full URL,
   // so that the app can create a shortURL to associate with it
   const user = req.session.user_id;
   // if user is not logged in, redirect to the login page
@@ -69,15 +79,17 @@ app.get("/urls/new", (req, res) => {
     res.redirect('/urls/login');
   };
   let templateVars = { 
-    user: users[user],
+    user: user,
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/register", (req, res) => {
   const user = req.session.user_id;
+  if (user) {
+    res.redirect("/urls");
+  }
   let templateVars = {
-    user: users[user],
     user: user,
   };
   res.render("urls_register", templateVars);
@@ -85,8 +97,10 @@ app.get("/urls/register", (req, res) => {
 
 app.get("/urls/login", (req, res) => {
   const user = req.session.user_id;
+  if (user) {
+    res.redirect("/urls");
+  }
   let templateVars = {
-    user: users[user],
     user: user,
   };
   res.render("urls_login", templateVars);
@@ -95,11 +109,12 @@ app.get("/urls/login", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   // shows a page where a shortURL and longURL pair are summarized
   // a user can then edit the longURL associated with the shortURL
-  const user = req.session.user_id;
+  const userID = req.session.user_id;
+  const user = users[userID];
   const shortURL = req.params.shortURL;
   
   let templateVars = { 
-    user: users[user],
+    user: user,
     shortURL: shortURL, 
     longURL: urlDatabase[req.params.shortURL],
     userHasURL: userHasURL(user.id, shortURL, urlDatabase)
@@ -111,6 +126,9 @@ app.get("/u/:shortURL", (req, res) => {
   // redirects the user to the website using the longURL associated
   // with a given shortURL
   const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL] === undefined) {
+    res.status(403).send('That shortURL does not exist.');
+  }
   const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 })
@@ -121,7 +139,7 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: req.session.user_id.id,
+    userID: req.session.user_id,
   };
   res.redirect(`/urls/${shortURL}`);
 });
@@ -132,7 +150,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const hasURL = userHasURL(user.id, shortURL, urlDatabase);
   if (!hasURL) {
     console.log("You don't have permission to delete that!");
-    res.redirect("/urls");
+    res.status(403).send("You don't have permission to delete that!");
   } else {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
@@ -143,12 +161,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls/:shortURL/edit", (req, res) => {
   const user = req.session.user_id;
+  if (!user) {
+    res.redirect("/login")
+  }
   const shortURL = req.params.shortURL;
   const hasURL = userHasURL(user.id, shortURL, urlDatabase);
-  console.log("hasURL", hasURL);
   if (!hasURL) {
     console.log("You don't have permission to edit that!");
-    res.redirect("/urls");
+    res.status(403).send("You don't have permission to edit that!");
   } else {
   // allows the user to set a new longURL for a given shortURL
   urlDatabase[req.params.shortURL] = req.body.newLongURL;
@@ -162,8 +182,6 @@ app.post("/login", (req, res) => {
   const userPassword = req.body.password;
   const userID = getUserID(userEmail, users); // returns false if userEmail in not in users
   const hashedPassword = users[userID].password;
-  console.log('userPassword', userPassword);
-  console.log('hashedPassword', hashedPassword);
   // check for errors in login details
   if (userEmail === '' || userPassword === '') {
     res.status(400).send('Sorry, incomplete login informaiton.');

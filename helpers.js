@@ -23,10 +23,13 @@ function urlsForUser(id, database) {
   // iterates through the urlDatase object
   let urlsFiltered = {};
   for (let shortURL in database) {
+    console.log(database[shortURL].userID)
     if (database[shortURL].userID === id) {
       urlsFiltered[shortURL] = database[shortURL].longURL;
+      console.log('if loop object', urlsFiltered);
     };
   };
+  console.log('urlsFiltered', urlsFiltered);
   return urlsFiltered;
 };
 
