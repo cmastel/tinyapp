@@ -19,6 +19,8 @@ app.use(cookieSession({
   keys: ['key1', 'key2']
 }));
 
+//---------------------- DATABASES -------------------------------//
+
 // initialize starting  url "database"
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "aJ48lW" },
@@ -38,6 +40,9 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+
+
+//---------------------- GET -------------------------------//
 
 app.get("/", (req, res) => {
   const user = req.session.user_id;
@@ -59,14 +64,12 @@ app.get("/urls", (req, res) => {
   // is initialized and "their" urls will be added to it
   let urlSummary = {};
   if (user) {
-    console.log('If is running for ', user.id);
     urlSummary = urlsForUser(user.id, urlDatabase);
   }
   let templateVars = { 
     user: user,
     urls: urlSummary // sending only the urls associated with the user
   };
-  console.log('urlDatabase', urlDatabase);
   res.render("urls_index", templateVars);
 });
 
@@ -74,7 +77,6 @@ app.get("/urls/new", (req, res) => {
   // /urls/new is a page where the user can specify a full URL,
   // so that the app can create a shortURL to associate with it
   const user = req.session.user_id;
-  // if user is not logged in, redirect to the login page
   if (!user) {
     res.redirect('/urls/login');
   };
@@ -116,8 +118,8 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
     user: user,
     shortURL: shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
-    userHasURL: userHasURL(user.id, shortURL, urlDatabase)
+    longURL: urlDatabase[shortURL].longURL,
+    userHasURL: userHasURL(user.id, shortURL, urlDatabase) // checks if user has permission for shortURL
   };
   res.render("urls_show", templateVars);
 });
@@ -133,9 +135,13 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 })
 
+//---------------------- POST -------------------------------//
+
+
 app.post("/urls", (req, res) => {
   // creates a random shortURL for a user inputed longURL
   // adds the new shortURL and longURL pair to the "database"
+  // along with attaching the user_id to the object
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
@@ -145,9 +151,9 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const user = req.session.user_id;
+  const userID = req.session.user_id;
   const shortURL = req.params.shortURL;
-  const hasURL = userHasURL(user.id, shortURL, urlDatabase);
+  const hasURL = userHasURL(userID, shortURL, urlDatabase);
   if (!hasURL) {
     console.log("You don't have permission to delete that!");
     res.status(403).send("You don't have permission to delete that!");
@@ -160,18 +166,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  const user = req.session.user_id;
-  if (!user) {
+  const userID = req.session.user_id;
+  if (!userID) {
     res.redirect("/login")
   }
   const shortURL = req.params.shortURL;
-  const hasURL = userHasURL(user.id, shortURL, urlDatabase);
+  const hasURL = userHasURL(userID, shortURL, urlDatabase);
   if (!hasURL) {
     console.log("You don't have permission to edit that!");
     res.status(403).send("You don't have permission to edit that!");
   } else {
   // allows the user to set a new longURL for a given shortURL
-  urlDatabase[req.params.shortURL] = req.body.newLongURL;
+  urlDatabase[req.params.shortURL].longURL = req.body.newLongURL;
   res.redirect("/urls");
   };
 });
@@ -230,6 +236,8 @@ app.post("/register", (req, res) => {
   req.session.user_id = userID;
   res.redirect("/urls");
 })
+
+//---------------------- SERVER -------------------------------//
 
 // set up a server to listen on the specified port
 app.listen(PORT, () => {
