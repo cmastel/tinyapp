@@ -102,7 +102,7 @@ app.get("/urls/:shortURL", (req, res) => {
     user: users[user],
     shortURL: shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    userHasURL: userHasURL(user.id, shortURL)
+    userHasURL: userHasURL(user.id, shortURL, urlDatabase)
   };
   res.render("urls_show", templateVars);
 });
@@ -129,7 +129,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user = req.session.user_id;
   const shortURL = req.params.shortURL;
-  const hasURL = userHasURL(user.id, shortURL);
+  const hasURL = userHasURL(user.id, shortURL, urlDatabase);
   if (!hasURL) {
     console.log("You don't have permission to delete that!");
     res.redirect("/urls");
@@ -144,7 +144,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/edit", (req, res) => {
   const user = req.session.user_id;
   const shortURL = req.params.shortURL;
-  const hasURL = userHasURL(user.id, shortURL);
+  const hasURL = userHasURL(user.id, shortURL, urlDatabase);
   console.log("hasURL", hasURL);
   if (!hasURL) {
     console.log("You don't have permission to edit that!");

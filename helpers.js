@@ -30,8 +30,8 @@ function urlsForUser(id, database) {
   return urlsFiltered;
 };
 
-function userHasURL(userID, shortURL) {
-  const userURLs = urlsForUser(userID);
+function userHasURL(userID, shortURL, database) {
+  const userURLs = urlsForUser(userID, database);
   const userURLKeys = Object.keys(userURLs);
   return userURLKeys.includes(shortURL);
 };
