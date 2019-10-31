@@ -3,6 +3,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcrypt');
+const { 
+  generateRandomString, 
+  getUserID,
+  urlsForUser,
+  userHasURL } = require('./helpers');
 
 const app = express();
 const PORT = 8080;
@@ -34,43 +39,43 @@ const users = {
   }
 };
 
-function generateRandomString() {
-  // generates a random alpha-numeric string of 6 characters
-  let randomString = '';
-  const r = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  for (let i = 0; i < 6; i++) {
-    randomString += r[Math.floor(Math.random() * r.length)];
-  };
-  return randomString;
-};
+// function generateRandomString() {
+//   // generates a random alpha-numeric string of 6 characters
+//   let randomString = '';
+//   const r = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+//   for (let i = 0; i < 6; i++) {
+//     randomString += r[Math.floor(Math.random() * r.length)];
+//   };
+//   return randomString;
+// };
 
-function getUserID(newEmail, database) {
-  // checks if a provided email address is already in the users "database"
-  let userID = false;
-  for (let user in database) {
-    if (database[user].email === newEmail) {
-      userID = user;
-    }; 
-  };
-  return userID;
-};
+// function getUserID(newEmail, database) {
+//   // checks if a provided email address is already in the users "database"
+//   let userID = false;
+//   for (let user in database) {
+//     if (database[user].email === newEmail) {
+//       userID = user;
+//     }; 
+//   };
+//   return userID;
+// };
 
-function urlsForUser(id) {
-  // iterates through the urlDatase object
-  let urlsFiltered = {};
-  for (let shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      urlsFiltered[shortURL] = urlDatabase[shortURL].longURL;
-    };
-  };
-  return urlsFiltered;
-};
+// function urlsForUser(id) {
+//   // iterates through the urlDatase object
+//   let urlsFiltered = {};
+//   for (let shortURL in urlDatabase) {
+//     if (urlDatabase[shortURL].userID === id) {
+//       urlsFiltered[shortURL] = urlDatabase[shortURL].longURL;
+//     };
+//   };
+//   return urlsFiltered;
+// };
 
-function userHasURL(userID, shortURL) {
-  const userURLs = urlsForUser(userID);
-  const userURLKeys = Object.keys(userURLs);
-  return userURLKeys.includes(shortURL);
-}
+// function userHasURL(userID, shortURL) {
+//   const userURLs = urlsForUser(userID);
+//   const userURLKeys = Object.keys(userURLs);
+//   return userURLKeys.includes(shortURL);
+// }
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -84,7 +89,7 @@ app.get("/urls", (req, res) => {
 
   let urlSummary = {};
   if (user) {
-    urlSummary = urlsForUser(user.id);
+    urlSummary = urlsForUser(user.id, urlDatabase);
   }
   let templateVars = { 
     user: users[user],
