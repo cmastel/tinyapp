@@ -158,10 +158,14 @@ app.get("/u/:shortURL", (req, res) => {
   // Future Update: move most of this code into a helper function
   let visitorID = req.session.visitor_id;
   if (!visitorID) {
-    visitorID = generateRandomString();
-    req.session.visitor_id = visitorID;
-    urlDatabase[shortURL].uniqueVisitors.push(visitorID);
+    newID = generateRandomString();
+    req.session.visitor_id = newID;
+    visitorID = req.session.visitor_id
   }
+  if (!urlDatabase[shortURL].uniqueVisitors.includes(visitorID)) {
+      urlDatabase[shortURL].uniqueVisitors.push(visitorID);
+  }
+  
   
   res.redirect(longURL);
 });
