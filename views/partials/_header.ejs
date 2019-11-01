@@ -23,7 +23,7 @@
     <!-- if there is a user_id, show the email address and a logout button -->
     <% } else{ %>
       <a>Logged In As: <%= user.email %></a>
-      <form class="form-inline" action="/logout" method="POST">
+      <form class="form-inline" action="/logout?_method=DELETE" method="POST">
         <div class="form-group mb-2">
           <button type="logout" class="btn btn-outline-dark" style="margin: 1em">Logout</button>
         </div>

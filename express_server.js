@@ -208,7 +208,7 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-app.post("/logout", (req, res) => {
+app.delete("/logout", (req, res) => {
   // when a user selects to logout, removes their user_id from
   // the cookie
   req.session = null;
@@ -233,6 +233,7 @@ app.post("/register", (req, res) => {
   }
 
   // add new user details to users "database"
+  // Future Update: move this to a helper function
   users[userID] = {
     id: userID,
     email: userEmail,
