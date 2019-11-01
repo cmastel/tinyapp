@@ -78,6 +78,7 @@ app.get("/urls", (req, res) => {
   }
   let templateVars = {
     user: user,
+    database: urlDatabase,
     urls: urlSummary // sending only the urls associated with the user
   };
   res.render("urls_index", templateVars);
@@ -163,7 +164,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 
-//---------------------- POST -------------------------------//
+//---------------------- POST / PUT / DELETE -------------------------------//
 
 
 app.post("/urls", (req, res) => {

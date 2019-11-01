@@ -2,7 +2,11 @@
 
 A full stack web app built with Node and Express that allows users to shorten long URLs (i.e. bit.ly).
 
+## Final Product
+
 ![urls screenshot](/images/urls.jpeg)
+
+![example_com screenshot](/images/example_com.jpeg)
 
 ## Purpose
 
@@ -12,27 +16,34 @@ This project was created and published by me as part of my learnings at Lighthou
 
 ## Usage
 
-**Install**
+### Key Features
 
+* Users can register and login - passwords are hashed for storage
+* Encrypted cookies are issued to the user to ensure handle permissions around the site
+* method-override is utilized to ensure the proper HTTP methods are implemented
+* Each page for a given shortURL shows:
+  * The number of times the shortURL has been used
+  * The number of unique visitors who have used the shortURL
+
+### Install
+
+Fork and Clone from the following Github repository:
 `https://github.com/cmastel/tinyapp`
 
-**Dependencies**
+### Dependencies
 
-Node.js
+* Node.js
 * Express
 * EJS
-* cookieParser
-* bodyParser
+* cookie-session
+* body-parser
+* bcrypt
+* method-override
 
-**Getting Started**
+### Getting Started
 
 * `npm install` to install all dependencies
 * Run the development web server using `node express_server.js`
 * Open `localhost:8080/urls` in your browser
 
 
-## Documentation
-
-The following functions are currently implemented:
-
-* `generateRandomString`: generates a random alpha-numeric string of 6 characters
