@@ -21,7 +21,7 @@ This project was created and published by me as part of my learnings at Lighthou
 * Users can register and login - passwords are hashed for storage
 * Encrypted cookies are issued to the user to ensure handle permissions around the site
 * method-override is utilized to ensure the proper HTTP methods are implemented
-* Each page for a given shortURL shows:
+* The Index and shortURL specific pages each show the following analytics:
   * The number of times the shortURL has been used
   * The number of unique visitors who have used the shortURL
   * The date the shortURL was created
@@ -29,7 +29,7 @@ This project was created and published by me as part of my learnings at Lighthou
 ### Install
 
 Fork and Clone from the following Github repository:
-`https://github.com/cmastel/tinyapp`
+https://github.com/cmastel/tinyapp
 
 ### Dependencies
 
@@ -44,7 +44,9 @@ Fork and Clone from the following Github repository:
 ### Getting Started
 
 * `npm install` to install all dependencies
-* Run the development web server using `node express_server.js`
+* Run the development web server using 
+\
+`node express_server.js`
 * Open `localhost:8080/urls` in your browser
 
 
