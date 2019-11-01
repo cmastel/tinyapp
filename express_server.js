@@ -145,7 +145,7 @@ app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const timeStamp = Date.now();
   if (urlDatabase[shortURL] === undefined) {
-    res.status(403).send('That shortURL does not exist.');
+    res.status(403).send('That shortURL does not exist.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   }
   const longURL = urlDatabase[shortURL].longURL;
   urlDatabase[shortURL].showPageCount += 1; // update count on number of times the shortURL is visited
@@ -161,6 +161,7 @@ app.get("/u/:shortURL", (req, res) => {
   
   res.redirect(longURL);
 });
+
 
 //---------------------- POST -------------------------------//
 
@@ -185,7 +186,7 @@ app.delete("/urls/:shortURL", (req, res) => {
   const hasURL = userHasURL(userID, shortURL, urlDatabase);
   if (!hasURL) {
     console.log("You don't have permission to delete that!");
-    res.status(403).send("You don't have permission to delete that!");
+    res.status(403).send('You do not have permission to delete that!\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   } else {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
@@ -203,7 +204,7 @@ app.put("/urls/:shortURL", (req, res) => {
   const hasURL = userHasURL(userID, shortURL, urlDatabase);
   if (!hasURL) {
     console.log("You don't have permission to edit that!");
-    res.status(403).send("You don't have permission to edit that!");
+    res.status(403).send('You do not have permission to delete that!\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   } else {
   // allows the user to set a new longURL for a given shortURL
     urlDatabase[req.params.shortURL].longURL = req.body.newLongURL;
@@ -216,15 +217,15 @@ app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const userID = getUserID(userEmail, users); // returns false if userEmail in not in users
-  const hashedPassword = users[userID].password;
+  // const hashedPassword = users[userID].password;
   // check for errors in login details
   if (userEmail === '' || userPassword === '') {
-    res.status(400).send('Sorry, incomplete login informaiton.');
+    res.status(400).send('Sorry, incomplete login informaiton.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   }
   if (!userID) {
-    res.status(403).send('That email address does not exist.');
-  } else if (!bcrypt.compareSync(userPassword, hashedPassword)) {
-    res.status(403).send('Incorrect password.');
+    res.status(403).send('That email address does not exist.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
+  } else if (!bcrypt.compareSync(userPassword, users[userID].password)) {
+    res.status(403).send('Incorrect password.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   } else {
     req.session.user_id = userID;
   }
@@ -250,10 +251,10 @@ app.post("/register", (req, res) => {
   
   // check for errors in register details
   if (userEmail === '' || userPassword === '') {
-    res.status(400).send('Sorry, incomplete login informaiton.');
+    res.status(400).send('Sorry, incomplete login informaiton.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   }
   if (getUserID(userEmail, users)) {
-    res.status(400).send('That email address already exists as a user.');
+    res.status(400).send('That email address already exists as a user.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   }
 
   // add new user details to users "database"
