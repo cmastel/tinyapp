@@ -25,18 +25,18 @@ app.use(cookieSession({
 
 // initialize starting  url "database"
 const urlDatabase = {
-  "b2xVn2": { 
-    longURL: "http://www.lighthouselabs.ca", 
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
     userID: "aJ48lW",
     showPageCount: 0,
     uniqueVisitors: [],
-    createdOn: 2010-03-21 },
-  "9sm5xK": { 
-    longURL: "http://google.com", 
+    createdOn: '2010-03-21' },
+  "9sm5xK": {
+    longURL: "http://google.com",
     userID: "aJ48lW",
     showPageCount: 0,
     uniqueVisitors: [],
-    createdOn: 2045-04-01 }
+    createdOn: '2045-04-01' }
 };
 
 // initialize starting users "database"
@@ -147,7 +147,6 @@ app.get("/u/:shortURL", (req, res) => {
   // redirects the user to the website using the longURL associated
   // with a given shortURL
   const shortURL = req.params.shortURL;
-  const timeStamp = Date.now();
   if (urlDatabase[shortURL] === undefined) {
     res.status(403).send('That shortURL does not exist.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
   }
@@ -158,12 +157,12 @@ app.get("/u/:shortURL", (req, res) => {
   // Future Update: move most of this code into a helper function
   let visitorID = req.session.visitor_id;
   if (!visitorID) {
-    newID = generateRandomString();
+    const newID = generateRandomString();
     req.session.visitor_id = newID;
-    visitorID = req.session.visitor_id
+    visitorID = req.session.visitor_id;
   }
   if (!urlDatabase[shortURL].uniqueVisitors.includes(visitorID)) {
-      urlDatabase[shortURL].uniqueVisitors.push(visitorID);
+    urlDatabase[shortURL].uniqueVisitors.push(visitorID);
   }
   
   
