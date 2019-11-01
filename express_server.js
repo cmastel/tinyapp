@@ -151,6 +151,7 @@ app.get("/u/:shortURL", (req, res) => {
   urlDatabase[shortURL].showPageCount += 1; // update count on number of times the shortURL is visited
   
   // keep track of the unique visitors using the shortURL
+  // Future Update: move most of this code into a helper function
   let visitorID = req.session.visitor_id;
   if (!visitorID) {
     visitorID = generateRandomString();
