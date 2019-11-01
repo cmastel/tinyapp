@@ -29,12 +29,14 @@ const urlDatabase = {
     longURL: "http://www.lighthouselabs.ca", 
     userID: "aJ48lW",
     showPageCount: 0,
-    uniqueVisitors: [], },
+    uniqueVisitors: [],
+    createdOn: 2010-03-21 },
   "9sm5xK": { 
     longURL: "http://google.com", 
     userID: "aJ48lW",
     showPageCount: 0,
-    uniqueVisitors: [], }
+    uniqueVisitors: [],
+    createdOn: 2045-04-01 }
 };
 
 // initialize starting users "database"
@@ -61,7 +63,6 @@ app.get("/", (req, res) => {
   } else {
     res.redirect("/urls/login");
   }
-  
 });
 
 app.get("/urls", (req, res) => {
@@ -132,10 +133,12 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     user: user,
     shortURL: shortURL,
-    longURL: urlDatabase[shortURL].longURL,
+    //longURL: urlDatabase[shortURL].longURL,
     userHasURL: userHasURL(user.id, shortURL, urlDatabase), // checks if user has permission for shortURL,
-    showPageCount: urlDatabase[shortURL].showPageCount,
-    uniqueVisitors: urlDatabase[shortURL].uniqueVisitors.length
+    // showPageCount: urlDatabase[shortURL].showPageCount,
+    // uniqueVisitors: urlDatabase[shortURL].uniqueVisitors.length,
+    // createdOn: urlDatabase[shortURL].createdOn,
+    database: urlDatabase
   };
   res.render("urls_show", templateVars);
 });
@@ -172,11 +175,14 @@ app.post("/urls", (req, res) => {
   // adds the new shortURL and longURL pair to the "database"
   // along with attaching the user_id to the object
   const shortURL = generateRandomString();
+  const created = new Date;
+  const createdDate = created.getFullYear() + '-' + (created.getMonth() + 1) + '-' + created.getDate();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
     showPageCount: 0,
     uniqueVisitors: [],
+    createdOn: createdDate
   };
   res.redirect(`/urls/${shortURL}`);
 });

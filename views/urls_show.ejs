@@ -23,10 +23,11 @@
           to link to that webpage -->
       <div class="card-header"></div>
         <div class="card-body">
-          <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+          <h5 class="card-title">TinyURL for: <%= database[shortURL].longURL %></h5>
           <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
-          <p class="card-text">Number of visits: <%= showPageCount %></p>
-          <p class="card-test">Number of unique visitors: <%= uniqueVisitors %></p>
+          <p class="card-text">Number of visits: <%= database[shortURL].showPageCount %></p>
+          <p class="card-test">Number of unique visitors: <%= database[shortURL].uniqueVisitors.length %></p>
+          <p class="card-test">Short URL created on: <%= database[shortURL].createdOn %></p>
         </div>
       <!-- Lower Section to Edit the longURL of the given shortURL -->
       <div class="card-footer text-muted">
@@ -34,7 +35,7 @@
         <form class="form-inline justify-content-center" action="/urls/<%= shortURL %>?_method=PUT" method="POST">
           <div class="form-group mb-2">
             <label for="new-long-url">New URL:</label>
-            <input class="form-control" type="text" name="newLongURL" placeholder="<%= longURL %>" style="width: 250px; margin: 1em">
+            <input class="form-control" type="text" name="newLongURL" placeholder="<%= database[shortURL].longURL %>" style="width: 250px; margin: 1em">
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>
         </form>

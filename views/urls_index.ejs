@@ -33,6 +33,7 @@
             <th scope="col">Edit</th>
             <th scope="col">Delete</th>
             <th scope="col">View Count</th>
+            <th scope="col">Created On</th>
           </tr>
         </thead>
         <tbody>
@@ -59,6 +60,9 @@
               </td>
               <td>
                 <%= database[url].showPageCount %>
+              </td>
+              <td>
+                <%= database[url].createdOn %>
               </td>
             </tr>
           <% } %>
