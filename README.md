@@ -6,7 +6,7 @@ A full stack web app built with Node and Express that allows users to shorten lo
 
 ![urls screenshot](/images/urls.jpeg)
 
-![example_com screenshot](/images/example_com.jpeg)
+![show screenshot](/images/show.jpeg)
 
 ## Purpose
 
@@ -24,6 +24,7 @@ This project was created and published by me as part of my learnings at Lighthou
 * Each page for a given shortURL shows:
   * The number of times the shortURL has been used
   * The number of unique visitors who have used the shortURL
+  * The date the shortURL was created
 
 ### Install
 
