@@ -28,11 +28,13 @@ const urlDatabase = {
   "b2xVn2": { 
     longURL: "http://www.lighthouselabs.ca", 
     userID: "aJ48lW",
-    showPageCount: 0 },
+    showPageCount: 0,
+    uniqueVisitors: [], },
   "9sm5xK": { 
     longURL: "http://google.com", 
     userID: "aJ48lW",
-    showPageCount: 0 }
+    showPageCount: 0,
+    uniqueVisitors: [], }
 };
 
 // initialize starting users "database"
@@ -48,6 +50,7 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+
 
 //---------------------- GET -------------------------------//
 
@@ -130,7 +133,8 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
     userHasURL: userHasURL(user.id, shortURL, urlDatabase), // checks if user has permission for shortURL,
-    showPageCount: urlDatabase[shortURL].showPageCount
+    showPageCount: urlDatabase[shortURL].showPageCount,
+    uniqueVisitors: urlDatabase[shortURL].uniqueVisitors.length
   };
   res.render("urls_show", templateVars);
 });
@@ -139,11 +143,21 @@ app.get("/u/:shortURL", (req, res) => {
   // redirects the user to the website using the longURL associated
   // with a given shortURL
   const shortURL = req.params.shortURL;
+  const timeStamp = Date.now();
   if (urlDatabase[shortURL] === undefined) {
     res.status(403).send('That shortURL does not exist.');
   }
-  urlDatabase[shortURL].showPageCount += 1; // update count on number of times the shortURL is visited
   const longURL = urlDatabase[shortURL].longURL;
+  urlDatabase[shortURL].showPageCount += 1; // update count on number of times the shortURL is visited
+  
+  // keep track of the unique visitors using the shortURL
+  let visitorID = req.session.visitor_id;
+  if (!visitorID) {
+    visitorID = generateRandomString();
+    req.session.visitor_id = visitorID;
+    urlDatabase[shortURL].uniqueVisitors.push(visitorID);
+  }
+  
   res.redirect(longURL);
 });
 
@@ -159,6 +173,7 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL,
     userID: req.session.user_id,
     showPageCount: 0,
+    uniqueVisitors: [],
   };
   res.redirect(`/urls/${shortURL}`);
 });
