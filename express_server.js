@@ -77,7 +77,7 @@ app.get("/urls", (req, res) => {
   if (user) {
     urlSummary = urlsForUser(user.id, urlDatabase);
   }
-  let templateVars = {
+  const templateVars = {
     user: user,
     database: urlDatabase,
     urls: urlSummary // sending only the urls associated with the user
@@ -93,7 +93,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect('/urls/login');
     return;
   }
-  let templateVars = {
+  const templateVars = {
     user: user,
   };
   res.render("urls_new", templateVars);
@@ -105,7 +105,7 @@ app.get("/urls/register", (req, res) => {
     res.redirect("/urls");
     return;
   }
-  let templateVars = {
+  const templateVars = {
     user: user,
   };
   res.render("urls_register", templateVars);
@@ -117,7 +117,7 @@ app.get("/urls/login", (req, res) => {
     res.redirect("/urls");
     return;
   }
-  let templateVars = {
+  const templateVars = {
     user: user,
   };
   res.render("urls_login", templateVars);
@@ -127,17 +127,16 @@ app.get("/urls/:shortURL", (req, res) => {
   // shows a page where a shortURL and longURL pair are summarized
   // a user can then edit the longURL associated with the shortURL
   const userID = req.session.user_id;
+  if (!userID) {
+    res.redirect("/urls/login");
+  }
   const user = users[userID];
   const shortURL = req.params.shortURL;
   
-  let templateVars = {
+  const templateVars = {
     user: user,
     shortURL: shortURL,
-    //longURL: urlDatabase[shortURL].longURL,
     userHasURL: userHasURL(user.id, shortURL, urlDatabase), // checks if user has permission for shortURL,
-    // showPageCount: urlDatabase[shortURL].showPageCount,
-    // uniqueVisitors: urlDatabase[shortURL].uniqueVisitors.length,
-    // createdOn: urlDatabase[shortURL].createdOn,
     database: urlDatabase
   };
   res.render("urls_show", templateVars);
@@ -155,7 +154,7 @@ app.get("/u/:shortURL", (req, res) => {
   
   // keep track of the unique visitors using the shortURL
   // Future Update: move most of this code into a helper function
-  let visitorID = req.session.visitor_id;
+  const visitorID = req.session.visitor_id;
   if (!visitorID) {
     const newID = generateRandomString();
     req.session.visitor_id = newID;
@@ -227,7 +226,6 @@ app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const userID = getUserID(userEmail, users); // returns false if userEmail in not in users
-  // const hashedPassword = users[userID].password;
   // check for errors in login details
   if (userEmail === '' || userPassword === '') {
     res.status(400).send('Sorry, incomplete login informaiton.\n<a class="navbar-brand" href="/urls">TinyApp</a>');
